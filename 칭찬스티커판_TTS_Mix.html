@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>칭찬 스티커판 💖</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --p1: #FF85C1; --p2: #FFB3D9; --p3: #FFF5FC;
+  --v1: #C084FC; --v2: #E9D5FF;
+  --y1: #FCD34D; --y2: #FEF08A;
+  --white: #FFFFFF;
+  --text: #5B2D72; --text-mid: #B06BBD;
+  --shadow: 0 6px 24px rgba(192,100,220,0.18);
+  --card-shadow: 0 4px 16px rgba(192,100,220,0.13);
+
+  --fs-title: 28px; --fs-sub: 14px; --fs-month: 20px;
+  --fs-dow: 12px; --fs-daynum: 13px; --fs-sticker: 14px;
+  --fs-act-emoji: 44px; --fs-act-label: 13px;
+  --fs-confirm: 18px; --fs-modal-title: 22px;
+  --cell-min: 50px; --act-cols: 3; --act-gap: 10px; --act-pad: 14px 6px;
+  --modal-pad: 22px 18px;
+  --today-scale: 1.0;
+}
+@media (max-width: 390px) {
+  :root {
+    --fs-title: 22px; --fs-sub: 12px; --fs-month: 16px;
+    --fs-dow: 10px; --fs-daynum: 11px; --fs-sticker: 11px;
+    --fs-act-emoji: 32px; --fs-act-label: 11px;
+    --fs-confirm: 15px; --fs-modal-title: 18px;
+    --cell-min: 36px; --act-gap: 7px; --act-pad: 9px 4px;
+    --modal-pad: 14px 12px;
+  }
+}
+@media (min-width: 768px) {
+  :root {
+    --fs-title: 36px; --fs-sub: 17px; --fs-month: 24px;
+    --fs-dow: 15px; --fs-daynum: 16px; --fs-sticker: 19px;
+    --fs-act-emoji: 54px; --fs-act-label: 15px;
+    --fs-confirm: 22px; --fs-modal-title: 26px;
+    --cell-min: 70px; --act-cols: 4; --act-gap: 14px; --act-pad: 18px 10px;
+    --modal-pad: 28px 24px;
+  }
+}
+@media (min-width: 1024px) { :root { --cell-min: 86px; --fs-sticker: 24px; } }
+
+body {
+  font-family: 'Apple SD Gothic Neo', 'Nanum Gothic', sans-serif;
+  min-height: 100dvh; overflow-x: hidden; background: #FFF5FC;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse at 15% 8%,  #FFD6EE 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 88%, #EDE0FF 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 45%, #FFF9C4 0%, transparent 42%),
+    #FFF5FC;
+}
+
+.floaty { position:fixed; pointer-events:none; z-index:0; font-size:22px; animation:floatUp 8s ease-in-out infinite; opacity:0.15; }
+.floaty:nth-child(1){left:5%;top:72%;animation-duration:7s}
+.floaty:nth-child(2){left:88%;top:62%;animation-duration:9s;animation-delay:2s}
+.floaty:nth-child(3){left:12%;top:22%;animation-duration:6s;animation-delay:1s}
+.floaty:nth-child(4){left:76%;top:14%;animation-duration:10s;animation-delay:3s}
+.floaty:nth-child(5){left:50%;top:82%;animation-duration:8s;animation-delay:1.5s}
+@keyframes floatUp{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-26px) rotate(14deg)}}
+
+.screen{display:none;min-height:100dvh;padding:16px 12px 40px;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column;align-items:center}
+@media(max-width:390px){.screen{padding:10px 8px 28px}}
+@media(min-width:768px){.screen{padding:24px 20px 50px}}
+
+/* ── 헤더 ── */
+.app-header{text-align:center;margin-bottom:14px;width:100%}
+.char-face{display:block;margin:0 auto 8px;width:clamp(90px,20vw,145px)}
+.app-title{font-size:var(--fs-title);font-weight:900;letter-spacing:-0.5px;background:linear-gradient(135deg,#FF60A8,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.app-sub{font-size:var(--fs-sub);color:var(--text-mid);margin-top:4px;font-weight:700}
+
+/* ── 오늘 날짜 배너 ── */
+.today-banner{
+  width:100%;max-width:760px;
+  background:linear-gradient(135deg,#FF85C1,#C084FC);
+  border-radius:20px;padding:12px 18px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 18px rgba(192,100,220,0.3);cursor:pointer;
+  animation:bannerPulse 3s ease-in-out infinite;
+}
+@keyframes bannerPulse{0%,100%{box-shadow:0 4px 18px rgba(192,100,220,0.3)}50%{box-shadow:0 4px 28px rgba(192,100,220,0.55)}}
+.today-banner-left{display:flex;align-items:center;gap:10px}
+.today-banner-icon{font-size:clamp(28px,7vw,40px);animation:iconWiggle 2s ease-in-out infinite}
+@keyframes iconWiggle{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-12deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(6deg)}}
+.today-banner-text{color:white}
+.today-banner-day{font-size:clamp(18px,4.5vw,26px);font-weight:900;line-height:1.1}
+.today-banner-date{font-size:clamp(12px,3vw,15px);font-weight:700;opacity:0.88;margin-top:2px}
+.today-banner-btn{background:white;border:none;border-radius:14px;padding:10px 16px;font-size:clamp(13px,3.2vw,16px);font-weight:900;color:#A855F7;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+.today-banner-btn:active{transform:scale(0.94)}
+
+/* ── 월 네비 ── */
+.month-nav{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  background:var(--white);border-radius:50px;padding:7px 14px;
+  box-shadow:var(--card-shadow);border:2.5px solid var(--p2);
+}
+.nav-btn{
+  width:clamp(36px,9vw,48px);height:clamp(36px,9vw,48px);flex-shrink:0;
+  border:none;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(18px,5vw,26px);transition:transform 0.12s;
+  background:linear-gradient(135deg,var(--p1),var(--v1));
+  box-shadow:0 3px 10px rgba(192,100,220,0.35);color:white;
+}
+.nav-btn:active{transform:scale(0.86)}
+.month-label-wrap{flex:1;text-align:center}
+.month-label{font-size:var(--fs-month);font-weight:800;color:var(--text);letter-spacing:-0.5px;cursor:pointer;display:inline-block}
+.month-label:active{opacity:0.7}
+.speak-icon{font-size:14px;margin-left:4px;opacity:0.6}
+
+/* ── 달력 ── */
+.calendar-wrap{width:100%;max-width:760px;background:var(--white);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;border:3px solid var(--p2)}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);background:linear-gradient(135deg,#FF85C1,#C084FC)}
+.cal-dow{text-align:center;padding:10px 2px;font-size:var(--fs-dow);font-weight:800;color:var(--white)}
+.cal-dow:nth-child(1){color:#FFE4F0}
+.cal-dow:nth-child(7){color:#DCCFFF}
+
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:4px;background:var(--p3)}
+
+/* 일반 날짜 칸 */
+.cal-cell{
+  background:var(--white);border-radius:10px;
+  aspect-ratio:1;min-height:var(--cell-min);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding-top:4px;gap:0;cursor:pointer;
+  transition:transform 0.13s,box-shadow 0.13s;
+  border:2px solid transparent;overflow:hidden;position:relative;
+}
+.cal-cell:active{transform:scale(0.86)}
+.cal-cell.empty{background:transparent;cursor:default;border:none}
+.cal-cell.sunday .day-num{color:#FF5B8D}
+.cal-cell.saturday .day-num{color:var(--v1)}
+.day-num{font-size:var(--fs-daynum);font-weight:800;color:var(--text);line-height:1}
+
+/* ── 오늘 칸 — 크고 화려하게 ── */
+.cal-cell.today{
+  background:linear-gradient(160deg,#FFE0F0,#EDE0FF);
+  border-color:var(--p1);
+  box-shadow:0 0 0 2.5px var(--p1), 0 4px 16px rgba(255,133,193,0.45);
+  z-index:2;
+  border-radius:14px;
+}
+.today-badge{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#FF85C1,#A855F7);
+  color:white;font-size:clamp(7px,1.8vw,10px);font-weight:900;
+  padding:1px 6px;border-radius:0 0 8px 8px;
+  white-space:nowrap;letter-spacing:0.3px;
+  box-shadow:0 2px 6px rgba(168,85,247,0.4);
+}
+.today-num-wrap{display:flex;flex-direction:column;align-items:center;margin-top:14px;gap:1px}
+.cal-cell.today .day-num{
+  font-size:clamp(16px,4.5vw,26px);
+  background:linear-gradient(135deg,#FF60A8,#A855F7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:todayPop 1.8s ease-in-out infinite alternate;
+}
+@keyframes todayPop{from{transform:scale(1)}to{transform:scale(1.12)}}
+.today-star{font-size:clamp(9px,2.2vw,13px);animation:twinkle 1s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:0.5;transform:scale(0.9)}to{opacity:1;transform:scale(1.1)}}
+
+.cell-stickers{display:flex;flex-wrap:wrap;justify-content:center;max-width:100%;padding:1px}
+.mini-sticker{font-size:var(--fs-sticker);line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.15));animation:popIn 0.4s cubic-bezier(0.34,1.8,0.64,1)}
+@keyframes popIn{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+
+/* ── 모달 ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(80,20,100,0.36);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:100;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--white);border-radius:32px 32px 0 0;width:100%;max-width:760px;padding:var(--modal-pad);padding-bottom:max(env(safe-area-inset-bottom,16px),28px);animation:slideUp 0.38s cubic-bezier(0.34,1.56,0.64,1);max-height:93dvh;overflow-y:auto;position:relative;border-top:4px solid var(--p1)}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0.6}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:44px;height:5px;background:var(--p2);border-radius:3px;margin:0 auto 14px}
+.modal-title{font-size:var(--fs-modal-title);font-weight:900;color:var(--text);text-align:center;margin-bottom:4px}
+.modal-date{font-size:14px;color:var(--text-mid);text-align:center;margin-bottom:16px;font-weight:700;cursor:pointer}
+.modal-date:active{opacity:0.7}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--p3);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center}
+
+/* ── 활동 그리드 ── */
+.activity-grid{display:grid;grid-template-columns:repeat(var(--act-cols),1fr);gap:var(--act-gap);margin-bottom:14px}
+.activity-btn{
+  background:linear-gradient(160deg,#FFF5FB,#F3E8FF);
+  border:3px solid var(--p2);border-radius:20px;padding:var(--act-pad);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s;
+  -webkit-tap-highlight-color:transparent;position:relative;min-height:44px;
+}
+.activity-btn:active{transform:scale(0.88)}
+.activity-btn.selected{border-color:var(--p1);background:linear-gradient(160deg,#FFE0F0,#EDE0FF);transform:scale(1.05);box-shadow:0 6px 18px rgba(255,133,193,0.4)}
+.activity-btn.selected::after{content:'✓';position:absolute;top:-10px;right:-8px;background:linear-gradient(135deg,var(--p1),var(--v1));color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 2px 8px rgba(192,100,220,0.4)}
+.activity-emoji{font-size:var(--fs-act-emoji);line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))}
+.activity-label{font-size:var(--fs-act-label);font-weight:800;color:var(--text);text-align:center;word-break:keep-all;line-height:1.25}
+
+/* ── 확인 버튼 ── */
+.confirm-btn{width:100%;padding:16px;border:none;border-radius:20px;font-size:var(--fs-confirm);font-weight:900;cursor:pointer;transition:transform 0.12s,box-shadow 0.12s;font-family:inherit;letter-spacing:-0.3px}
+.confirm-btn:active{transform:scale(0.96)}
+.confirm-btn.ready{background:linear-gradient(135deg,#FF85C1,#A855F7);color:white;box-shadow:0 8px 24px rgba(168,85,247,0.4)}
+.confirm-btn.not-ready{background:#F0E8F5;color:#C4A8D0;cursor:not-allowed}
+
+/* ── 기록 ── */
+.sticker-list-section{width:100%;max-width:760px;margin-top:16px}
+.sticker-list-title{font-size:clamp(14px,3.5vw,18px);font-weight:900;color:var(--text);margin-bottom:10px;padding-left:4px}
+.sticker-day-row{background:var(--white);border-radius:16px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(192,100,220,0.1);border:2px solid var(--v2)}
+.sticker-day-label{font-size:clamp(13px,3vw,16px);font-weight:800;color:var(--text);min-width:30px}
+.sticker-day-emojis{font-size:clamp(13px,3vw,16px);flex:1;word-break:keep-all;line-height:1.6;color:var(--text)}
+.sticker-day-delete{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;flex-shrink:0;opacity:0.35}
+
+/* ── 삭제 다이얼로그 ── */
+.del-dialog-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(80,20,100,0.38);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+.del-dialog-overlay.open{display:flex}
+.del-dialog{background:var(--white);border-radius:28px;padding:28px 24px 20px;width:100%;max-width:340px;text-align:center;border:3px solid var(--p2);box-shadow:0 12px 40px rgba(192,100,220,0.25);animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.del-dialog-emoji{font-size:48px;margin-bottom:10px}
+.del-dialog-title{font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px}
+.del-dialog-sub{font-size:14px;color:var(--text-mid);font-weight:700;margin-bottom:20px;min-height:20px}
+.del-dialog-btns{display:flex;gap:10px}
+.del-btn-cancel{flex:1;padding:14px;border:2.5px solid var(--p2);background:var(--white);border-radius:16px;font-size:16px;font-weight:800;color:var(--text-mid);cursor:pointer;font-family:inherit}
+.del-btn-ok{flex:1;padding:14px;border:none;background:linear-gradient(135deg,#FF85C1,#A855F7);border-radius:16px;font-size:16px;font-weight:800;color:white;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(168,85,247,0.35)}
+.del-btn-cancel:active,.del-btn-ok:active{transform:scale(0.95)}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,var(--p1),var(--v1));color:white;padding:12px 24px;border-radius:50px;font-size:15px;font-weight:700;opacity:0;transition:all 0.3s;z-index:200;white-space:nowrap;pointer-events:none;box-shadow:0 6px 20px rgba(168,85,247,0.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── 칭찬 오버레이 ── */
+.celebration{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,240,252,0.93);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.celebration.show{display:flex}
+.celeb-char{display:block;margin:0 auto;width:clamp(140px,32vw,210px);animation:celebBounce 0.5s ease-in-out infinite alternate}
+@keyframes celebBounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-16px) scale(1.07)}}
+.celeb-stars{font-size:clamp(26px,6vw,46px);letter-spacing:6px;margin-top:10px;animation:twinkle2 0.6s ease-in-out infinite alternate}
+@keyframes twinkle2{from{opacity:0.65}to{opacity:1}}
+.celeb-text{font-size:clamp(26px,6.5vw,44px);font-weight:900;margin-top:10px;text-align:center;padding:0 20px;background:linear-gradient(135deg,#FF60A8,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.celeb-sub{font-size:clamp(14px,3vw,18px);color:var(--text-mid);margin-top:6px;text-align:center;padding:0 24px;font-weight:700}
+.celeb-stickers{font-size:clamp(38px,10vw,62px);margin-top:12px;letter-spacing:6px}
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:299;overflow:hidden}
+
+/* ── 음성 버튼 (공통) ── */
+.speak-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px;opacity:0.7;transition:transform 0.1s}
+.speak-btn:active{transform:scale(0.85)}
+</style>
+</head>
+<body>
+
+<div class="floaty">💖</div>
+<div class="floaty">⭐</div>
+<div class="floaty">💜</div>
+<div class="floaty">✨</div>
+<div class="floaty">🌸</div>
+
+<!-- ── 메인 ── -->
+<div class="screen active" id="mainScreen">
+  <div class="app-header">
+    <img class="char-face" src="stick_img2.webp" alt="캐릭터">
+    <div class="app-title">💖 칭찬 스티커판</div>
+    <div class="app-sub">오늘도 잘했어요! ⭐</div>
+  </div>
+
+  <!-- 오늘 날짜 배너 -->
+  <div class="today-banner" id="todayBanner">
+    <div class="today-banner-left">
+      <div class="today-banner-icon">📅</div>
+      <div class="today-banner-text">
+        <div class="today-banner-day" id="bannerDay">오늘은 ○요일</div>
+        <div class="today-banner-date" id="bannerDate">○월 ○일이에요!</div>
+      </div>
+    </div>
+    <button class="today-banner-btn" id="bannerSpeakBtn">🔊 읽어줘!</button>
+  </div>
+
+  <div class="month-nav">
+    <button class="nav-btn" id="prevMonthBtn">‹</button>
+    <div class="month-label-wrap">
+      <span class="month-label" id="monthLabel" title="눌러서 읽기"></span>
+      <span class="speak-icon">🔊</span>
+    </div>
+    <button class="nav-btn" id="nextMonthBtn">›</button>
+  </div>
+
+  <div class="calendar-wrap">
+    <div class="cal-header">
+      <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
+      <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <div class="sticker-list-section">
+    <div class="sticker-list-title">💝 이번 달 칭찬 기록</div>
+    <div id="stickerList"></div>
+  </div>
+</div>
+
+<!-- ── 활동 선택 모달 ── -->
+<div class="modal-overlay" id="pickerModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-title">🌟 뭘 잘했나요?</div>
+    <div class="modal-date" id="pickerDateLabel"></div>
+    <div class="activity-grid" id="activityGrid"></div>
+    <button class="confirm-btn not-ready" id="confirmBtn">골라봐요! 👆</button>
+  </div>
+</div>
+
+<!-- ── 칭찬 오버레이 ── -->
+<div class="celebration" id="celebrationOverlay">
+  <img class="celeb-char" src="stick_img2.webp" alt="캐릭터">
+  <div class="celeb-stars">⭐ ⭐ ⭐</div>
+  <div class="celeb-text" id="celebText">정말 잘했어요!</div>
+  <div class="celeb-sub"  id="celebSub"></div>
+  <div class="celeb-stickers" id="celebSticker"></div>
+</div>
+
+<!-- ── 삭제 다이얼로그 ── -->
+<div class="del-dialog-overlay" id="delDialog">
+  <div class="del-dialog">
+    <div class="del-dialog-emoji">🗑️</div>
+    <div class="del-dialog-title" id="delDialogTitle">스티커를 지울까요?</div>
+    <div class="del-dialog-sub" id="delDialogSub"></div>
+    <div class="del-dialog-btns">
+      <button class="del-btn-cancel" id="delCancelBtn">아니요 💖</button>
+      <button class="del-btn-ok"     id="delOkBtn">지울게요 🗑️</button>
+    </div>
+  </div>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════
+   ✅ API 키를 여기에 입력하세요
+════════════════════════════════ */
+const GOOGLE_TTS_KEY  = 'AIzaSyD1Ygrp4yz25nJKfhLYroRREA58OCDHZBE';    // Google TTS 키 (날짜·활동 음성)
+const ELEVEN_API_KEY  = 'sk_bfe1f8c17c278348291733a3c6c0c995872eeb6e9728a84b';  // ElevenLabs 키 (칭찬 환호 음성)
+const ELEVEN_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel (무료 기본 목소리 — 테스트용)
+
+/* ════════════════════════════════
+   Google Cloud TTS — 날짜·활동 읽기
+════════════════════════════════ */
+const _audioCache = {};
+let _currentAudio = null;
+
+async function speak(text) {
+  await _googleTTS({ input: { text }, speakingRate: 0.95, pitch: 2.0 });
+}
+
+async function _googleTTS({ input, speakingRate, pitch }) {
+  const cacheKey = 'g:' + JSON.stringify(input);
+  if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+  if (_audioCache[cacheKey]) { _playAudio(_audioCache[cacheKey]); return; }
+  try {
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input,
+          voice: { languageCode: 'ko-KR', name: 'ko-KR-Neural2-A' },
+          audioConfig: { audioEncoding: 'MP3', speakingRate, pitch }
+        })
+      }
+    );
+    if (!res.ok) throw new Error('Google TTS 오류');
+    const data = await res.json();
+    const src = 'data:audio/mp3;base64,' + data.audioContent;
+    _audioCache[cacheKey] = src;
+    _playAudio(src);
+  } catch (e) { _speakFallback(JSON.stringify(input)); }
+}
+
+/* ════════════════════════════════
+   ElevenLabs TTS — 칭찬 환호 전용
+   stability 낮게 + style 높게 = 감정 풍부하고 신나는 톤
+════════════════════════════════ */
+async function speakCheer(text) {
+  const cacheKey = 'e:' + text;
+  if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+  if (_audioCache[cacheKey]) { _playAudio(_audioCache[cacheKey]); return; }
+  try {
+    const res = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': ELEVEN_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.18,
+            similarity_boost: 0.85,
+            style: 0.82,
+            use_speaker_boost: true
+          }
+        })
+      }
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '(응답 없음)');
+      console.error(`[ElevenLabs] 오류 ${res.status}:`, errText);
+      throw new Error(`ElevenLabs ${res.status}`);
+    }
+    const blob = await res.blob();
+    const src  = URL.createObjectURL(blob);
+    _audioCache[cacheKey] = src;
+    _playAudio(src);
+  } catch (e) {
+    console.warn('[ElevenLabs] 실패, Google TTS로 대체:', e.message);
+    speak(text);
+  }
+}
+
+function _playAudio(src) {
+  const audio = new Audio(src);
+  _currentAudio = audio;
+  audio.play().catch(() => {});
+  audio.onended = () => { _currentAudio = null; };
+}
+
+function _speakFallback(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ko-KR'; utter.rate = 0.88; utter.pitch = 1.1;
+  const v = speechSynthesis.getVoices().find(v => v.lang.startsWith('ko'));
+  if (v) utter.voice = v;
+  speechSynthesis.speak(utter);
+}
+
+function _initVoices() {
+  // 폴백용 사전 로드
+  if (window.speechSynthesis) speechSynthesis.getVoices();
+}
+
+/* ════════════════════════════════
+   데이터
+════════════════════════════════ */
+const CHILD_NAME = '도아';
+
+const ACTIVITIES = [
+  {id:'brush', emoji:'🦷', label:'이 닦기 (치카치카)', speak:`오늘 ${CHILD_NAME}는 치카치카를 잘했어요!`},
+  {id:'hand',  emoji:'🙌', label:'손 씻기',            speak:`오늘 ${CHILD_NAME}는 손을 깨끗이 씻었어요!`},
+  {id:'dress', emoji:'👕', label:'옷 입기',             speak:`오늘 ${CHILD_NAME}는 혼자 옷을 입었어요!`},
+  {id:'eat',   emoji:'🍚', label:'밥 먹기',             speak:`오늘 ${CHILD_NAME}는 밥을 맛있게 먹었어요!`},
+  {id:'sleep', emoji:'😴', label:'일찍 자기',           speak:`오늘 ${CHILD_NAME}는 일찍 잠자리에 들었어요!`},
+  {id:'book',  emoji:'📚', label:'책 읽기',             speak:`오늘 ${CHILD_NAME}는 책을 읽었어요!`},
+  {id:'tidy',  emoji:'🧸', label:'장난감 정리',         speak:`오늘 ${CHILD_NAME}는 장난감을 스스로 정리했어요!`},
+  {id:'potty', emoji:'🚽', label:'화장실',              speak:`오늘 ${CHILD_NAME}는 혼자 화장실에 갔어요!`},
+];
+
+const MESSAGES = ['대단해요!', '잘했어요!', '멋져요!'];
+let _msgIndex = 0;
+const DOW_KO   = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+const MN_KO    = ['일월','이월','삼월','사월','오월','유월','칠월','팔월','구월','시월','십일월','십이월'];
+const MN_DISP  = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+// 숫자 한국어 읽기 (1~31)
+const NUM_KO   = ['','일','이','삼','사','오','육','칠','팔','구','십',
+                   '십일','십이','십삼','십사','십오','십육','십칠','십팔','십구','이십',
+                   '이십일','이십이','이십삼','이십사','이십오','이십육','이십칠','이십팔','이십구','삼십','삼십일'];
+
+let currentYear, currentMonth;
+let selectedActivities = new Set(), selectedDate = null, stickers = {};
+
+/* ── 저장소 폴백 ── */
+let _mem={}, _backend='memory';
+function _detectStorage(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');_backend='local';return}catch(e){}try{sessionStorage.setItem('__t','1');sessionStorage.removeItem('__t');_backend='session'}catch(e){}}
+function _get(k){try{if(_backend==='local')return localStorage.getItem(k);if(_backend==='session')return sessionStorage.getItem(k)}catch(e){}return _mem[k]||null}
+function _set(k,v){try{if(_backend==='local'){localStorage.setItem(k,v);return}if(_backend==='session'){sessionStorage.setItem(k,v);return}}catch(e){}_mem[k]=v}
+function loadData(){try{const r=_get('stickerData_v3');stickers=r?JSON.parse(r):{}}catch(e){stickers={}}}
+function saveData(){try{_set('stickerData_v3',JSON.stringify(stickers))}catch(e){}}
+function dateKey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+
+/* ── 오늘 배너 업데이트 ── */
+function updateTodayBanner() {
+  const t = new Date();
+  const dow = DOW_KO[t.getDay()];
+  const m   = MN_DISP[t.getMonth()];
+  const d   = t.getDate();
+  document.getElementById('bannerDay').textContent  = `오늘은 ${dow}`;
+  document.getElementById('bannerDate').textContent = `${m} ${d}일이에요!`;
+}
+
+function speakTodayDate() {
+  const t = new Date();
+  const dow = DOW_KO[t.getDay()];
+  const m   = MN_KO[t.getMonth()];
+  const d   = NUM_KO[t.getDate()];
+  const mn  = MN_DISP[t.getMonth()];
+  const dd  = t.getDate();
+  // 숫자를 하나씩 읽어줌: "오월 십오일, 수요일이에요!"
+  speak(`오늘은 ${m} ${d}일, ${dow}이에요!`, 0.82, 1.15);
+}
+
+function speakMonth() {
+  speak(`${NUM_KO[currentMonth+1]}월이에요!`, 0.82, 1.1);
+}
+
+/* ── 달력 렌더 ── */
+function renderCalendar() {
+  document.getElementById('monthLabel').textContent = `${currentYear}년 ${MN_DISP[currentMonth]}`;
+  const grid = document.getElementById('calGrid'); grid.innerHTML = '';
+  const today = new Date();
+  const fd  = new Date(currentYear, currentMonth, 1).getDay();
+  const dim = new Date(currentYear, currentMonth+1, 0).getDate();
+
+  for (let i=0; i<fd; i++) {
+    const e = document.createElement('div'); e.className='cal-cell empty'; grid.appendChild(e);
+  }
+
+  for (let d=1; d<=dim; d++) {
+    const cell = document.createElement('div');
+    const dow  = (fd + d - 1) % 7;
+    const isTd = today.getFullYear()===currentYear && today.getMonth()===currentMonth && today.getDate()===d;
+
+    let cls = 'cal-cell';
+    if (dow===0) cls += ' sunday';
+    if (dow===6) cls += ' saturday';
+    if (isTd)   cls += ' today';
+    cell.className = cls;
+
+    if (isTd) {
+      // 오늘 칸: 뱃지 + 큰 숫자 + 별
+      const badge = document.createElement('div');
+      badge.className = 'today-badge'; badge.textContent = '오늘!';
+      cell.appendChild(badge);
+
+      const wrap = document.createElement('div'); wrap.className = 'today-num-wrap';
+      const num  = document.createElement('div'); num.className  = 'day-num'; num.textContent = d;
+      const star = document.createElement('div'); star.className = 'today-star'; star.textContent = '⭐';
+      wrap.appendChild(num); wrap.appendChild(star);
+      cell.appendChild(wrap);
+    } else {
+      const num = document.createElement('div'); num.className = 'day-num'; num.textContent = d;
+      cell.appendChild(num);
+    }
+
+    const key = dateKey(currentYear, currentMonth, d);
+    if (stickers[key]?.length) {
+      const sc = document.createElement('div'); sc.className = 'cell-stickers';
+      stickers[key].forEach(s => {
+        const sp = document.createElement('span'); sp.className = 'mini-sticker'; sp.textContent = s.emoji;
+        sc.appendChild(sp);
+      });
+      cell.appendChild(sc);
+    }
+
+    // 날짜 클릭: 일수만 읽기 → 바로 스티커 모달
+    cell.addEventListener('click', () => {
+      speak(`${NUM_KO[d]}일!`, 0.88, 1.15);
+      setTimeout(() => openPicker(d), 350);
+    });
+    grid.appendChild(cell);
+  }
+
+  renderStickerList();
+}
+
+/* ── 삭제 다이얼로그 ── */
+let _delCb = null;
+function showDelDialog(title, sub, cb) {
+  _delCb = cb;
+  document.getElementById('delDialogTitle').textContent = title;
+  document.getElementById('delDialogSub').textContent   = sub;
+  document.getElementById('delDialog').classList.add('open');
+}
+function closeDelDialog() { document.getElementById('delDialog').classList.remove('open'); _delCb=null; }
+
+/* ── 기록 목록 ── */
+function renderStickerList() {
+  const list = document.getElementById('stickerList'); list.innerHTML = '';
+  const entries = [];
+  for (let d=1; d<=31; d++) {
+    const key = dateKey(currentYear, currentMonth, d);
+    if (stickers[key]?.length) entries.push({d, key, items: stickers[key]});
+  }
+  if (!entries.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-mid);padding:16px 0;font-size:14px;font-weight:700;">날짜를 눌러 스티커를 붙여봐요! 💖</div>';
+    return;
+  }
+  entries.forEach(({d, key, items}) => {
+    const row = document.createElement('div'); row.className = 'sticker-day-row';
+    row.innerHTML = `<div class="sticker-day-label">${d}일</div><div class="sticker-day-emojis">${items.map(i=>i.emoji).join(' ')} <span style="color:var(--text-mid);font-size:12px">${items.map(i=>i.label).join(' · ')}</span></div><button class="sticker-day-delete" title="삭제">🗑️</button>`;
+    row.querySelector('.sticker-day-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      showDelDialog(`${d}일 스티커를 지울까요?`, items.map(i=>i.emoji+' '+i.label).join('  '),
+        () => { delete stickers[key]; saveData(); renderCalendar(); });
+    });
+    list.appendChild(row);
+  });
+}
+
+/* ── 활동 모달 ── */
+function openPicker(d) {
+  selectedDate = d; selectedActivities = new Set();
+  const dow = DOW_KO[(new Date(currentYear, currentMonth, d).getDay())];
+  document.getElementById('pickerDateLabel').textContent = `${MN_DISP[currentMonth]} ${d}일 (${dow}) 💖`;
+  buildActivityGrid(); updateConfirmBtn();
+  document.getElementById('pickerModal').classList.add('open');
+}
+
+function buildActivityGrid() {
+  const grid = document.getElementById('activityGrid'); grid.innerHTML = '';
+  ACTIVITIES.forEach(act => {
+    const btn = document.createElement('button'); btn.className = 'activity-btn';
+    btn.innerHTML = `<div class="activity-emoji">${act.emoji}</div><div class="activity-label">${act.label}</div>`;
+    btn.addEventListener('click', () => {
+      if (selectedActivities.has(act.id)) {
+        selectedActivities.delete(act.id); btn.classList.remove('selected');
+      } else {
+        selectedActivities.add(act.id); btn.classList.add('selected');
+        speak(act.speak, 0.86, 1.15); // 활동 선택 시 바로 읽어줌
+      }
+      updateConfirmBtn();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function updateConfirmBtn() {
+  const btn = document.getElementById('confirmBtn');
+  if (selectedActivities.size > 0) {
+    btn.className = 'confirm-btn ready';
+    btn.textContent = `💖 스티커 ${selectedActivities.size}개 붙이기!`;
+  } else {
+    btn.className = 'confirm-btn not-ready';
+    btn.textContent = '골라봐요! 👆';
+  }
+}
+
+function closePicker() { document.getElementById('pickerModal').classList.remove('open'); }
+
+function confirmSticker() {
+  if (!selectedActivities.size) return;
+  const key = dateKey(currentYear, currentMonth, selectedDate);
+  if (!stickers[key]) stickers[key] = [];
+  const added = [];
+  selectedActivities.forEach(id => {
+    const act = ACTIVITIES.find(a => a.id===id);
+    if (act && !stickers[key].find(s=>s.id===id)) { stickers[key].push({id:act.id,emoji:act.emoji,label:act.label}); added.push(act); }
+  });
+  saveData(); closePicker(); renderCalendar();
+  if (added.length) showCelebration(added);
+}
+
+/* ── 칭찬 오버레이 ── */
+function showCelebration(added) {
+  const ov  = document.getElementById('celebrationOverlay');
+  const msg = MESSAGES[_msgIndex % MESSAGES.length];
+  _msgIndex++;
+  document.getElementById('celebText').textContent    = msg;
+  document.getElementById('celebSub').textContent     = added.map(a=>a.label).join(', ')+' 스티커!';
+  document.getElementById('celebSticker').textContent = added.map(a=>a.emoji).join(' ');
+  ov.classList.add('show'); launchConfetti();
+  speakCheer(msg);
+  setTimeout(() => { ov.classList.remove('show'); clearConfetti(); }, 3800);
+}
+
+function launchConfetti() {
+  const c = document.getElementById('confettiContainer'); c.innerHTML = '';
+  const shapes = ['💖','⭐','✨','🌸','💜','💛','💗','🌟','🎀','🩷'];
+  for (let i=0; i<60; i++) {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;font-size:${16+Math.random()*16}px;left:${Math.random()*100}%;top:-30px;animation:fall ${1.4+Math.random()*1.2}s ${Math.random()*0.9}s linear forwards`;
+    el.textContent = shapes[Math.floor(Math.random()*shapes.length)];
+    c.appendChild(el);
+  }
+  const s = document.createElement('style'); s.id='cs';
+  s.textContent = `@keyframes fall{0%{top:-30px;transform:rotate(0deg);opacity:1}100%{top:108vh;transform:rotate(${360+Math.floor(Math.random()*360)}deg);opacity:0}}`;
+  document.head.appendChild(s);
+}
+function clearConfetti() { document.getElementById('confettiContainer').innerHTML=''; const s=document.getElementById('cs'); if(s)s.remove(); }
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+_initVoices();
+try{_detectStorage()}catch(e){}
+try{loadData()}catch(e){stickers={}}
+try{const n=new Date();currentYear=n.getFullYear();currentMonth=n.getMonth()}catch(e){currentYear=2025;currentMonth=4}
+updateTodayBanner();
+try{renderCalendar()}catch(e){setTimeout(()=>{try{renderCalendar()}catch(e2){}},300)}
+
+/* ── 이벤트 ── */
+document.getElementById('bannerSpeakBtn').addEventListener('click', () => speakTodayDate());
+document.getElementById('todayBanner').addEventListener('click', e => {
+  if (e.target !== document.getElementById('bannerSpeakBtn')) speakTodayDate();
+});
+document.getElementById('prevMonthBtn').addEventListener('click', () => {
+  currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCalendar();
+});
+document.getElementById('nextMonthBtn').addEventListener('click', () => {
+  currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCalendar();
+});
+document.getElementById('modalClose').addEventListener('click', closePicker);
+document.getElementById('pickerModal').addEventListener('click', e => {
+  if (e.target===document.getElementById('pickerModal')) closePicker();
+});
+document.getElementById('confirmBtn').addEventListener('click', confirmSticker);
+document.getElementById('celebrationOverlay').addEventListener('click', () => {
+  document.getElementById('celebrationOverlay').classList.remove('show'); clearConfetti();
+});
+document.getElementById('delCancelBtn').addEventListener('click', closeDelDialog);
+document.getElementById('delOkBtn').addEventListener('click', () => { if(_delCb)_delCb(); closeDelDialog(); });
+document.getElementById('delDialog').addEventListener('click', e => {
+  if (e.target===document.getElementById('delDialog')) closeDelDialog();
+});
+</script>
+</body>
+</html>
